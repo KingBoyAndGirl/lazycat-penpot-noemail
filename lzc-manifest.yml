@@ -10,6 +10,7 @@ application:
   privileged: true
   multi_instance: true
   routes:
+    - /mcp=http://penpot-backend:6060
     - /=http://penpot-frontend:80
   public_path:
     - /
