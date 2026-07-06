@@ -97,6 +97,7 @@ services:
       - PENPOT_STORAGE_ASSETS_FS_DIRECTORY=/opt/data/assets
       - PENPOT_TELEMETRY_ENABLED=true
     depends_on:
+      - penpot-backend
       - penpot-postgres
       - penpot-redis
     binds:
