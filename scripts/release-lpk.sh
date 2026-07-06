@@ -45,33 +45,6 @@ mkdir -p lpk
 echo "打包 LPK: ${LPK_NAME}"
 lzc-cli project release -o "$LPK_PATH"
 
-# Inject init-admin.py into LPK root (ZIP format)
-echo "注入 init-admin.py 到 LPK 根目录..."
-python3 - "$LPK_PATH" "$(pwd)/init-admin.py" <<'PYINJECT'
-import sys, zipfile, io, os
-lpk_path = sys.argv[1]
-script_path = sys.argv[2]
-
-with open(script_path, 'r') as sf:
-    script_content = sf.read()
-
-with open(lpk_path, 'rb') as f:
-    original = f.read()
-
-output = io.BytesIO()
-with zipfile.ZipFile(io.BytesIO(original), 'r') as zin:
-    with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zout:
-        for item in zin.infolist():
-            data = zin.read(item.filename)
-            zout.writestr(item, data)
-        zout.writestr('init-admin.py', script_content)
-
-with open(lpk_path, 'wb') as f:
-    f.write(output.getvalue())
-print(f"init-admin.py injected, LPK size: {os.path.getsize(lpk_path)} bytes")
-PYINJECT
-
-
 if [[ ! -f "$LPK_PATH" ]]; then
   echo "::error::未找到 LPK: ${LPK_PATH}"
   exit 1

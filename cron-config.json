@@ -1,0 +1,15 @@
+{
+  "_note": "将此配置添加到 Hermes Studio 定时任务中（Web UI → 定时任务 → 新建）",
+  "_setup": "mkdir -p ~/.hermes/workspace && cd ~/.hermes/workspace && git clone https://github.com/KingBoyAndGirl/lazycat-penpot-noemail.git",
+  "job": {
+    "name": "检查 Penpot 上游更新",
+    "schedule": "0 10 * * *",
+    "workdir": "/home/agent/.hermes/workspace/lazycat-penpot-noemail",
+    "script": "python3 scripts/check-upstream-version.py",
+    "enabled": true,
+    "env": {
+      "GITHUB_TOKEN": "<your-github-token>",
+      "GITHUB_REPOSITORY": "KingBoyAndGirl/lazycat-penpot-noemail"
+    }
+  }
+}

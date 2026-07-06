@@ -30,10 +30,30 @@ lzc-cli project release -o lpk/io.zeroc.app.penpot-v$(date +%Y.%m.%d).lpk
 lzc-cli project dev
 ```
 
-## 自动升级
+## 自动升级（Hermes Studio Cron Job）
 
-- `.github/workflows/check-penpot-upgrade.yml` — 每天检查上游 Penpot 新版本
-- `.github/workflows/release-lpk.yml` — main push 时自动构建并发布 LPK
+本项目不使用 GitHub Actions，而是通过 **Hermes Studio Cron Job** 实现自动升级检查。
+
+### 设置 Job
+
+在 Hermes Studio Web UI → 定时任务 → 新建：
+
+- **名称**: Check Penpot Upgrade
+- **调度**: `0 10 * * *`（每天 10:00）
+- **工作目录**: `/home/agent/.hermes/workspace/lazycat-penpot-noemail`
+- **运行脚本**:
+  ```bash
+  python3 scripts/check-upstream-version.py
+  ```
+- **环境变量**:
+  - `GITHUB_TOKEN`: GitHub Personal Access Token（用于创建 PR）
+
+### Job 行为
+
+1. 检查 Penpot 上游 (`penpot/penpot`) 最新 Release tag
+2. 与 `UPSTREAM_VERSION` 对比
+3. 发现新版本 → 更新版本号 + CHANGELOG → 通过 GitHub API 创建 PR
+4. PR 需要人工检查镜像可用性后合并
 
 ## 上游
 
