@@ -1,0 +1,91 @@
+lzc-sdk-version: 0.1
+name: penpot
+package: io.zeroc.app.penpot
+version: 0.0.1
+description: 用于设计和代码协作的开源设计工具（无邮件版，PREPL 创建管理员）
+license: https://choosealicense.com/licenses/mit/
+homepage: https://github.com/penpot/penpot
+author: penpot
+application:
+  subdomain: penpot
+  routes:
+    - /=http://penpot-frontend.io.zeroc.app.penpot.lzcapp/
+  ingress:
+    - protocol: tcp
+      port: 80
+      service: penpot-frontend
+  depends_on:
+    - penpot-frontend
+services:
+  penpot-frontend:
+    image: registry.lazycat.cloud/zeroc/penpotapp/frontend:d73491da9a408a04
+    environment:
+      - PENPOT_FLAGS=disable-email-verification enable-prepl-server enable-mcp disable-secure-session-cookies
+    depends_on:
+      - penpot-backend
+      - penpot-exporter
+    binds:
+      - /lzcapp/var/data:/opt/data/assets
+    health_check:
+      test:
+        - CMD-SHELL
+        - "curl -f http://localhost/readyz || exit 1"
+  penpot-backend:
+    image: registry.lazycat.cloud/zeroc/zeroc0077/backend:83c6edeacbe68133
+    environment:
+      - PENPOT_FLAGS=disable-email-verification enable-prepl-server enable-mcp disable-secure-session-cookies
+      - PENPOT_PUBLIC_URI=http://${LAZYCAT_APP_ORIGIN}
+      - PENPOT_DATABASE_URI=postgresql://penpot-postgres/penpot
+      - PENPOT_DATABASE_USERNAME=penpot
+      - PENPOT_DATABASE_PASSWORD=penpot
+      - PENPOT_REDIS_URI=redis://penpot-redis/0
+      - PENPOT_ASSETS_STORAGE_BACKEND=assets-fs
+      - PENPOT_STORAGE_ASSETS_FS_DIRECTORY=/opt/data/assets
+      - PENPOT_TELEMETRY_ENABLED=true
+    depends_on:
+      - penpot-postgres
+      - penpot-redis
+    binds:
+      - /lzcapp/var/data:/opt/data/assets
+    health_check:
+      test:
+        - CMD-SHELL
+        - "curl -f http://localhost:6060/readyz || exit 1"
+  penpot-exporter:
+    image: registry.lazycat.cloud/zeroc/penpotapp/exporter:506d5f3c85a9ab99
+    environment:
+      - PENPOT_PUBLIC_URI=http://penpot-frontend
+      - PENPOT_REDIS_URI=redis://penpot-redis/0
+    health_check:
+      test:
+        - CMD-SHELL
+        - "curl -f http://localhost:6061/readyz || exit 1"
+  penpot-postgres:
+    image: registry.lazycat.cloud/zeroc/postgres:8cce992e23d242ff
+    environment:
+      - POSTGRES_INITDB_ARGS=--data-checksums
+      - POSTGRES_DB=penpot
+      - POSTGRES_USER=penpot
+      - POSTGRES_PASSWORD=penpot
+    binds:
+      - /lzcapp/var/db:/var/lib/postgresql/data
+    health_check:
+      test:
+        - CMD-SHELL
+        - "pg_isready -U penpot -d penpot"
+  penpot-redis:
+    image: registry.lazycat.cloud/zeroc/redis:7a3c44e6d89ea0a5
+    health_check:
+      test:
+        - CMD-SHELL
+        - "redis-cli ping"
+  penpot-init:
+    image: registry.lazycat.cloud/zeroc/zeroc0077/backend:83c6edeacbe68133
+    depends_on:
+      penpot-backend:
+        condition: service_healthy
+    entrypoint: ["python3", "/scripts/init-admin.py"]
+    restart: "no"
+unsupported_platforms:
+  - ios
+  - android

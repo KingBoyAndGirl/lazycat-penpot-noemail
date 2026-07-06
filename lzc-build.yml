@@ -1,0 +1,19 @@
+# LazyCat 构建配置 — Penpot (No-Email Edition)
+# init-admin.py 在 release-lpk.sh 的 post-build 步骤中注入 LPK 根目录
+buildscript: ":"
+manifest: ./lzc-manifest.yml
+contentdir: ./content
+pkgout: ./lpk
+icon: ./lzc-icon.png
+
+actions:
+  prebuild:
+    - mkdir -p ./lpk
+
+compose_override:
+  services:
+    penpot-init:
+      volumes:
+        - type: bind
+          source: ./init-admin.py
+          target: /scripts/init-admin.py

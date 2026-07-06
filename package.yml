@@ -1,0 +1,7 @@
+package: io.zeroc.app.penpot
+version: 2026.07.06
+name: Penpot (No-Email)
+description: Penpot 开源设计协作平台 — 无邮箱版，PREPL 直接创建管理员，支持 MCP 与多实例
+author: penpot
+homepage: https://github.com/penpot/penpot
+license: MIT
