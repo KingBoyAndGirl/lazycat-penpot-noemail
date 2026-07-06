@@ -15,6 +15,8 @@ application:
           params:
             user: admin@qq.com
             password: admin123
+            autoSubmit: false
+            debug: true
   setup_script: |
     #!/bin/sh
     echo "[setup] Waiting for penpot-backend PREPL..."
@@ -58,6 +60,8 @@ services:
       - PENPOT_ASSETS_STORAGE_BACKEND=assets-fs
       - PENPOT_STORAGE_ASSETS_FS_DIRECTORY=/opt/data/assets
       - PENPOT_TELEMETRY_ENABLED=true
+      - PENPOT_DATABASE_MIN_SIZE=5
+      - PENPOT_DATABASE_MAX_SIZE=25
     depends_on:
       - penpot-postgres
       - penpot-redis
@@ -96,6 +100,8 @@ services:
       - PENPOT_ASSETS_STORAGE_BACKEND=assets-fs
       - PENPOT_STORAGE_ASSETS_FS_DIRECTORY=/opt/data/assets
       - PENPOT_TELEMETRY_ENABLED=true
+      - PENPOT_DATABASE_MIN_SIZE=2
+      - PENPOT_DATABASE_MAX_SIZE=10
     depends_on:
       - penpot-backend
       - penpot-postgres
@@ -111,6 +117,7 @@ services:
       start_period: 120s
   penpot-postgres:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/postgres:16-alpine
+    command: -c max_connections=300
     environment:
       - POSTGRES_INITDB_ARGS=--data-checksums
       - POSTGRES_DB=penpot
