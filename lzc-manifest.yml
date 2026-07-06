@@ -15,7 +15,9 @@ application:
           params:
             user: admin@qq.com
             password: admin123
-            autoSubmit: false
+            autoSubmit: true
+            submitDelayMs: 500
+            submitKeywords: '继续,登录,登錄,continue,login,signin'
             debug: true
   setup_script: |
     #!/bin/sh
