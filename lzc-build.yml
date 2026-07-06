@@ -12,3 +12,11 @@ actions:
 resource_exports:
   - kind: skills
     source: ./resources/skills
+
+compose_override:
+  services:
+    penpot-frontend:
+      volumes:
+        - type: bind
+          source: /lzcapp/pkg/content/mcp-custom.conf
+          target: /etc/nginx/overrides/server.d/mcp-custom.conf
