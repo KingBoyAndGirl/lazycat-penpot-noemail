@@ -2,10 +2,19 @@ application:
   subdomain: penpot
   multi_instance: true
   routes:
-    - /mcp=http://penpot-auto-login:80
-    - /=http://penpot-auto-login:80
+    - /mcp=http://penpot-frontend:8080
+    - /=http://penpot-frontend:8080
   public_path:
     - /
+  injects:
+    - id: login-autofill
+      when:
+        - /#/auth/login
+      do:
+        - src: builtin://simple-inject-password
+          params:
+            user: admin@qq.com
+            password: admin123
   setup_script: |
     #!/bin/sh
     echo "[setup] Waiting for penpot-backend PREPL..."
@@ -17,7 +26,7 @@ application:
     printf '{"cmd":"create-profile","params":{"fullname":"Admin","email":"admin@qq.com","password":"admin123"}}\n' | nc -w 5 penpot-backend 6063
     echo "[setup] Init done"
   health_check:
-    test_url: http://penpot-auto-login:80/readyz
+    test_url: http://penpot-frontend:8080/readyz
     start_period: 300s
     timeout: 5s
 services:
@@ -99,19 +108,6 @@ services:
       interval: 10s
       timeout: 5s
       start_period: 120s
-  penpot-auto-login:
-    image: registry.cn-shanghai.aliyuncs.com/wtjking/nginx:alpine
-    depends_on:
-      - penpot-frontend
-      - penpot-backend
-    entrypoint: /entrypoint.sh
-    health_check:
-      test:
-        - CMD-SHELL
-        - "curl -f http://localhost/readyz || exit 1"
-      interval: 10s
-      timeout: 5s
-      start_period: 60s
   penpot-postgres:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/postgres:16-alpine
     environment:

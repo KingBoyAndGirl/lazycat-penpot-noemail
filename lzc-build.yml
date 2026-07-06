@@ -12,14 +12,3 @@ actions:
 resource_exports:
   - kind: skills
     source: ./resources/skills
-
-compose_override:
-  services:
-    penpot-auto-login:
-      volumes:
-        - type: bind
-          source: /lzcapp/pkg/content/nginx-auto-login.conf
-          target: /etc/nginx/conf.d/default.conf
-        - type: bind
-          source: /lzcapp/pkg/content/entrypoint-auto-login.sh
-          target: /entrypoint.sh
