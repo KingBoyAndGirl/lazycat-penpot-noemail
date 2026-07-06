@@ -6,6 +6,17 @@ application:
     - /=http://penpot-frontend:8080
   public_path:
     - /
+  setup_script: |
+    #!/bin/sh
+    # Wait for penpot-backend PREPL, then create admin account
+    echo "[setup] Waiting for penpot-backend PREPL..."
+    for i in $(seq 1 60); do
+      printf '{"cmd":"echo","params":{}}\n' | nc -w 2 penpot-backend 6063 >/dev/null 2>&1 && break
+      sleep 2
+    done
+    echo "[setup] Creating admin account..."
+    printf '{"cmd":"create-profile","params":{"fullname":"Admin","email":"wangw9475@agent.qq.com","password":"admin123"}}\n' | nc -w 5 penpot-backend 6063
+    echo "[setup] Init done"
   health_check:
     test_url: http://penpot-frontend:8080/readyz
     start_period: 300s
@@ -29,6 +40,7 @@ services:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/penpot-backend:2.16.2
     environment:
       - PENPOT_FLAGS=disable-email-verification enable-prepl-server enable-mcp disable-secure-session-cookies
+      - PENPOT_SREPL_HOST=0.0.0.0
       - PENPOT_SECRET_KEY=penpot-lazycat-secret-key-change-in-production
       - PENPOT_PUBLIC_URI=http://penpot-frontend
       - PENPOT_DATABASE_URI=postgresql://penpot-postgres/penpot
