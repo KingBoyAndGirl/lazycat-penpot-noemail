@@ -1,3 +1,0 @@
-# Penpot MCP Server
-# 通过 enable-mcp flag 启用，其他懒猫应用以 app.io.zeroc.app.penpot.lzcx/mcp/stream 访问
-endpoint: /mcp/stream

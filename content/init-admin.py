@@ -15,7 +15,7 @@ MAX_RETRIES = 60
 RETRY_INTERVAL = 2
 
 ADMIN_FULLNAME = "admin"
-ADMIN_EMAIL = "admin"
+ADMIN_EMAIL = "admin@qq.com"
 ADMIN_PASSWORD = "admin123"
 
 

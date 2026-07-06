@@ -10,7 +10,5 @@ actions:
     - mkdir -p ./content ./lpk
 
 resource_exports:
-  - kind: mcp-providers
-    source: ./resources/mcp-providers
   - kind: skills
     source: ./resources/skills
