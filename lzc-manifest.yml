@@ -10,14 +10,49 @@ application:
     - PENPOT_ADMIN_EMAIL='{{ index .U "login_user" }}'
     - PENPOT_ADMIN_PASSWORD='{{ index .U "login_password" }}'
   injects:
-    - id: login-autofill
+    # request 阶段：抓取登录请求里的邮箱和密码
+    - id: penpot-capture-login
+      auth_required: false
+      on: request
+      when:
+        - /api/rpc/command/login-with-password
+      do: |
+        let payload = null;
+        try { payload = ctx.body.getJSON(); } catch { payload = null; }
+        if (!payload || typeof payload !== "object") return;
+        const email = payload.email || payload["~:email"] || "";
+        const password = payload.password || payload["~:password"] || "";
+        if (email) ctx.flow.set("penpot_email", email);
+        if (password) ctx.flow.set("penpot_password", password);
+    # response 阶段：登录成功才持久化
+    - id: penpot-commit-login
+      auth_required: false
+      on: response
+      when:
+        - /api/rpc/command/login-with-password
+      do: |
+        if (ctx.status < 200 || ctx.status >= 300) return;
+        const email = ctx.flow.get("penpot_email");
+        const password = ctx.flow.get("penpot_password");
+        if (typeof email === "string" && email.length > 0) {
+          ctx.persist.set("penpot.email", email);
+        }
+        if (typeof password === "string" && password.length > 0) {
+          ctx.persist.set("penpot.password", password);
+        }
+    # browser 阶段：登录页自动填充（优先用持久化的，回退到部署参数）
+    - id: penpot-login-autofill
       when:
         - /#/auth/login
       do:
         - src: builtin://simple-inject-password
           params:
-            user: '{{ index .U "login_user" }}'
-            password: '{{ index .U "login_password" }}'
+            user:
+              $persist: penpot.email
+              default: '{{ index .U "login_user" }}'
+            password:
+              $persist: penpot.password
+              default: '{{ index .U "login_password" }}'
             autoSubmit: true
             submitMode: enter
             submitDelayMs: 800
