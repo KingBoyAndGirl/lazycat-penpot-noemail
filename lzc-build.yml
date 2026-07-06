@@ -14,11 +14,3 @@ resource_exports:
     source: ./resources/mcp-providers
   - kind: skills
     source: ./resources/skills
-
-compose_override:
-  services:
-    penpot-init:
-      volumes:
-        - type: bind
-          source: /lzcapp/pkg/content/init-admin.py
-          target: /scripts/init-admin.py

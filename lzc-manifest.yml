@@ -1,13 +1,5 @@
-name: penpot
-package: io.zeroc.app.penpot
-version: 0.0.1
-description: 用于设计和代码协作的开源设计工具（无邮件版，PREPL 创建管理员）
-license: https://choosealicense.com/licenses/mit/
-homepage: https://github.com/penpot/penpot
-author: penpot / 王.W
 application:
   subdomain: penpot
-  privileged: true
   multi_instance: true
   routes:
     - /mcp=http://penpot-backend:6060
@@ -33,12 +25,12 @@ services:
       interval: 10s
       timeout: 5s
       start_period: 120s
-
   penpot-backend:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/penpot-backend:2.16.2
     environment:
       - PENPOT_FLAGS=disable-email-verification enable-prepl-server enable-mcp disable-secure-session-cookies
-      - PENPOT_PUBLIC_URI=http://${LAZYCAT_APP_ORIGIN}
+      - PENPOT_SECRET_KEY=penpot-lazycat-secret-key-change-in-production
+      - PENPOT_PUBLIC_URI=http://penpot-frontend
       - PENPOT_DATABASE_URI=postgresql://penpot-postgres/penpot
       - PENPOT_DATABASE_USERNAME=penpot
       - PENPOT_DATABASE_PASSWORD=penpot
@@ -58,11 +50,11 @@ services:
       interval: 10s
       timeout: 5s
       start_period: 120s
-
   penpot-exporter:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/penpot-exporter:2.16.2
     environment:
       - PENPOT_PUBLIC_URI=http://penpot-frontend
+      - PENPOT_SECRET_KEY=penpot-lazycat-secret-key-change-in-production
       - PENPOT_REDIS_URI=redis://penpot-redis/0
     health_check:
       test:
@@ -71,7 +63,6 @@ services:
       interval: 10s
       timeout: 5s
       start_period: 60s
-
   penpot-postgres:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/postgres:16-alpine
     environment:
@@ -88,7 +79,6 @@ services:
       interval: 10s
       timeout: 5s
       start_period: 30s
-
   penpot-redis:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/redis:7-alpine
     health_check:
@@ -98,15 +88,3 @@ services:
       interval: 10s
       timeout: 5s
       start_period: 10s
-
-  penpot-init:
-    image: registry.cn-shanghai.aliyuncs.com/wtjking/penpot-backend:2.16.2
-    depends_on:
-      penpot-backend:
-        condition: service_healthy
-    entrypoint: ["python3", "/scripts/init-admin.py"]
-    restart: "no"
-
-unsupported_platforms:
-  - ios
-  - android
