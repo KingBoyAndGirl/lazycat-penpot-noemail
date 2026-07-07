@@ -96,7 +96,7 @@ services:
       - PENPOT_FLAGS=disable-email-verification enable-prepl-server enable-mcp disable-secure-session-cookies
       - PENPOT_SREPL_HOST=0.0.0.0
       - PENPOT_SECRET_KEY=penpot-lazycat-secret-key-change-in-production
-      - PENPOT_PUBLIC_URI=http://penpot-frontend
+      - PENPOT_PUBLIC_URI=https://penpot.nasw.heiyu.space
       - PENPOT_DATABASE_URI=postgresql://penpot-postgres/penpot
       - PENPOT_DATABASE_USERNAME=penpot
       - PENPOT_DATABASE_PASSWORD=penpot
