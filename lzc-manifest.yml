@@ -2,6 +2,7 @@ application:
   subdomain: penpot
   multi_instance: false
   routes:
+    - /mailcatch=http://penpot-mailcatch:1080
     - /mcp=http://penpot-frontend:8080
     - /=http://penpot-frontend:8080
   public_path:
@@ -23,7 +24,7 @@ services:
     binds:
       - /lzcapp/var/data:/opt/data/assets
     environment:
-      - PENPOT_FLAGS=disable-email-verification enable-prepl-server enable-mcp disable-secure-session-cookies
+      - PENPOT_FLAGS=enable-smtp enable-prepl-server enable-mcp disable-secure-session-cookies
     depends_on:
       - penpot-backend
       - penpot-exporter
@@ -38,13 +39,21 @@ services:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/penpot-backend:2.16.2
     command: /bin/bash /lzcapp/pkg/content/backend-entrypoint.sh
     environment:
-      - PENPOT_FLAGS=disable-email-verification enable-prepl-server enable-mcp disable-secure-session-cookies
+      - PENPOT_FLAGS=enable-smtp enable-prepl-server enable-mcp disable-secure-session-cookies
       - PENPOT_SREPL_HOST=0.0.0.0
       - PENPOT_SECRET_KEY=penpot-lazycat-secret-key-change-in-production
       - PENPOT_ADMIN_EMAIL=admin@qq.com
       - PENPOT_ADMIN_PASSWORD=admin123
       - PENPOT_ADMIN_FULLNAME=Admin
       - PENPOT_PUBLIC_URI=https://${LAZYCAT_APP_DOMAIN}
+      - PENPOT_SMTP_DEFAULT_FROM=no-reply@example.com
+      - PENPOT_SMTP_DEFAULT_REPLY_TO=no-reply@example.com
+      - PENPOT_SMTP_HOST=penpot-mailcatch
+      - PENPOT_SMTP_PORT=1025
+      - PENPOT_SMTP_USERNAME=
+      - PENPOT_SMTP_PASSWORD=
+      - PENPOT_SMTP_TLS=false
+      - PENPOT_SMTP_SSL=false
       - PENPOT_DATABASE_URI=postgresql://penpot-postgres/penpot
       - PENPOT_DATABASE_USERNAME=penpot
       - PENPOT_DATABASE_PASSWORD=penpot
@@ -57,6 +66,7 @@ services:
     depends_on:
       - penpot-postgres
       - penpot-redis
+      - penpot-mailcatch
     binds:
       - /lzcapp/var/data:/opt/data/assets
     health_check:
@@ -90,6 +100,8 @@ services:
       interval: 10s
       timeout: 10s
       start_period: 15s
+  penpot-mailcatch:
+    image: registry.cn-shanghai.aliyuncs.com/wtjking/mailcatcher:latest
   penpot-postgres:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/postgres:16-alpine
     command: -c max_connections=300

@@ -6,6 +6,7 @@
 - 移除免密登录 inject 与 deploy params 残留。
 - 新增 backend 内部启动包装脚本，在 `penpot-backend` 容器内等待 PREPL 并自动创建管理员账号，避免依赖 app 容器内的 `docker` / `python3` / `nc`。
 - `PENPOT_PUBLIC_URI` 改为基于 `${LAZYCAT_APP_DOMAIN}`，适配 NASW / Canway / 新机器域名。
+- 恢复官方开发模式的假邮件系统 `penpot-mailcatch`：backend SMTP 指向本地 mailcatcher，用户可在 `/mailcatch` 查看验证邮件并点击注册链接。
 
 ## v2026.07.06
 
