@@ -117,7 +117,7 @@ services:
   penpot-exporter:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/penpot-exporter:2.16.2
     environment:
-      - PENPOT_PUBLIC_URI=http://penpot-frontend
+      - PENPOT_PUBLIC_URI=http://penpot-frontend:8080
       - PENPOT_SECRET_KEY=penpot-lazycat-secret-key-change-in-production
       - PENPOT_REDIS_URI=redis://penpot-redis/0
     health_check:
