@@ -2,7 +2,7 @@ application:
   subdomain: penpot
   multi_instance: false
   routes:
-    - /mailcatch=http://penpot-mailcatch:1080
+    - /mailcatch=http://penpot-frontend:8080
     - /mcp=http://penpot-frontend:8080
     - /=http://penpot-frontend:8080
   public_path:
@@ -21,6 +21,8 @@ application:
 services:
   penpot-frontend:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/penpot-frontend:2.16.2
+    entrypoint: /bin/sh /lzcapp/pkg/content/frontend-entrypoint.sh
+    command: nginx -g 'daemon off;'
     binds:
       - /lzcapp/var/data:/opt/data/assets
     environment:
