@@ -1,74 +1,18 @@
 application:
   subdomain: penpot
-  multi_instance: true
+  multi_instance: false
   routes:
     - /mcp=http://penpot-frontend:8080
     - /=http://penpot-frontend:8080
   public_path:
     - /
   envs:
-    - PENPOT_ADMIN_EMAIL='{{ index .U "login_user" }}'
-    - PENPOT_ADMIN_PASSWORD='{{ index .U "login_password" }}'
-  injects:
-    # request 阶段：抓取登录请求里的邮箱和密码
-    - id: penpot-capture-login
-      auth_required: false
-      on: request
-      when:
-        - /api/rpc/command/login-with-password
-      do: |
-        let payload = null;
-        try { payload = ctx.body.getJSON(); } catch { payload = null; }
-        if (!payload || typeof payload !== "object") return;
-        const email = payload.email || payload["~:email"] || "";
-        const password = payload.password || payload["~:password"] || "";
-        if (email) ctx.flow.set("penpot_email", email);
-        if (password) ctx.flow.set("penpot_password", password);
-    # response 阶段：登录成功才持久化
-    - id: penpot-commit-login
-      auth_required: false
-      on: response
-      when:
-        - /api/rpc/command/login-with-password
-      do: |
-        if (ctx.status < 200 || ctx.status >= 300) return;
-        const email = ctx.flow.get("penpot_email");
-        const password = ctx.flow.get("penpot_password");
-        if (typeof email === "string" && email.length > 0) {
-          ctx.persist.set("penpot.email", email);
-        }
-        if (typeof password === "string" && password.length > 0) {
-          ctx.persist.set("penpot.password", password);
-        }
-    # browser 阶段：登录页自动填充（优先用持久化的，回退到部署参数）
-    - id: penpot-login-autofill
-      when:
-        - /#/auth/login
-      do:
-        - src: builtin://simple-inject-password
-          params:
-            user:
-              $persist: penpot.email
-              default: '{{ index .U "login_user" }}'
-            password:
-              $persist: penpot.password
-              default: '{{ index .U "login_password" }}'
-            autoSubmit: true
-            submitMode: enter
-            submitDelayMs: 800
-            debug: true
+    - PENPOT_ADMIN_EMAIL='admin@qq.com'
+    - PENPOT_ADMIN_PASSWORD='admin123'
   setup_script: |
     #!/bin/sh
     # 修复 assets 目录权限（LazyCat 默认 root 所有权，penpot 用户 uid=1001 无法写入）
     chown 1001:1001 /lzcapp/var/data 2>/dev/null || true
-    echo "[setup] Waiting for penpot-backend PREPL..."
-    for i in $(seq 1 60); do
-      printf '{"cmd":"echo","params":{}}\n' | nc -w 2 penpot-backend 6063 >/dev/null 2>&1 && break
-      sleep 2
-    done
-    echo "[setup] Creating admin account..."
-    printf '{"cmd":"create-profile","params":{"fullname":"Admin","email":"%s","password":"%s"}}\n' "$PENPOT_ADMIN_EMAIL" "$PENPOT_ADMIN_PASSWORD" | nc -w 5 penpot-backend 6063
-    echo "[setup] Init done"
   health_check:
     test_url: http://penpot-frontend:8080/readyz
     start_period: 300s
@@ -92,11 +36,15 @@ services:
       start_period: 120s
   penpot-backend:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/penpot-backend:2.16.2
+    command: /bin/bash /lzcapp/pkg/content/backend-entrypoint.sh
     environment:
       - PENPOT_FLAGS=disable-email-verification enable-prepl-server enable-mcp disable-secure-session-cookies
       - PENPOT_SREPL_HOST=0.0.0.0
       - PENPOT_SECRET_KEY=penpot-lazycat-secret-key-change-in-production
-      - PENPOT_PUBLIC_URI=https://penpot.nasw.heiyu.space
+      - PENPOT_ADMIN_EMAIL=admin@qq.com
+      - PENPOT_ADMIN_PASSWORD=admin123
+      - PENPOT_ADMIN_FULLNAME=Admin
+      - PENPOT_PUBLIC_URI=https://${LAZYCAT_APP_DOMAIN}
       - PENPOT_DATABASE_URI=postgresql://penpot-postgres/penpot
       - PENPOT_DATABASE_USERNAME=penpot
       - PENPOT_DATABASE_PASSWORD=penpot

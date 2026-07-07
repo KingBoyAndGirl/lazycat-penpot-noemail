@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026.07.08
+- 改为单实例部署，保留官方 Penpot 登录页。
+- 固定管理员账号 `admin@qq.com / admin123`。
+- 移除免密登录 inject 与 deploy params 残留。
+- 新增 backend 内部启动包装脚本，在 `penpot-backend` 容器内等待 PREPL 并自动创建管理员账号，避免依赖 app 容器内的 `docker` / `python3` / `nc`。
+- `PENPOT_PUBLIC_URI` 改为基于 `${LAZYCAT_APP_DOMAIN}`，适配 NASW / Canway / 新机器域名。
+
 ## v2026.07.06
 
 ### 变更
