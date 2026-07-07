@@ -59,6 +59,8 @@ application:
             debug: true
   setup_script: |
     #!/bin/sh
+    # 修复 assets 目录权限（LazyCat 默认 root 所有权，penpot 用户 uid=1001 无法写入）
+    chown 1001:1001 /lzcapp/var/data 2>/dev/null || true
     echo "[setup] Waiting for penpot-backend PREPL..."
     for i in $(seq 1 60); do
       printf '{"cmd":"echo","params":{}}\n' | nc -w 2 penpot-backend 6063 >/dev/null 2>&1 && break
