@@ -5,6 +5,13 @@ ADMIN_EMAIL="${PENPOT_ADMIN_EMAIL:-admin@qq.com}"
 ADMIN_PASSWORD="${PENPOT_ADMIN_PASSWORD:-admin123}"
 ADMIN_FULLNAME="${PENPOT_ADMIN_FULLNAME:-Admin}"
 
+# repair assets ownership before dropping privileges; required for object storage, thumbnails and export
+mkdir -p /opt/data/assets 2>/dev/null || true
+if [ "$(id -u)" = "0" ]; then
+  chown 1001:1001 /opt/data/assets 2>/dev/null || true
+  exec /usr/sbin/runuser -u penpot -- /bin/bash "$0" "$@"
+fi
+
 echo "[backend-entrypoint] starting Penpot backend"
 /bin/bash run.sh &
 backend_pid=$!

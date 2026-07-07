@@ -15,6 +15,10 @@ resource_exports:
 
 compose_override:
   services:
+    penpot-backend:
+      # Start wrapper as root so it can repair the /lzcapp/var/data bind ownership,
+      # then backend-entrypoint.sh drops privileges back to penpot before running Penpot.
+      user: "0:0"
     penpot-frontend:
       volumes:
         - type: bind

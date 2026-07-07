@@ -2,6 +2,9 @@
 
 ## 2026.07.08
 
+### 导出/缩略图修复
+- 通过 `compose_override` 让 backend wrapper 先以 root 启动，修复 `/opt/data/assets` bind 目录为 `1001:1001` 后再降权到 `penpot`；修复 `AccessDeniedException: /opt/data/assets/...` 导致的缩略图/导出失败。
+
 ### Mailcatch 子路径修复
 - 新增面向 Penpot 邀请/验证流程的友好收件箱，默认展示收件邮箱、主题、打开/复制邀请链接，并保留 `/mailcatch/raw/` 原始 MailCatcher 调试入口。
 - MailCatcher 启动参数增加 `--http-path /mailcatch`，让页面输出 `/mailcatch/assets/...`，避免浏览器继续请求 Penpot 根路径 `/assets/...`。
