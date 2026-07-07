@@ -6,14 +6,13 @@ OVERRIDE_FILE="$OVERRIDE_DIR/mailcatch-locations.conf"
 mkdir -p "$OVERRIDE_DIR"
 cat > "$OVERRIDE_FILE" <<'EOF'
 # MailCatcher UI under /mailcatch.
-# MailCatcher itself serves from / and emits absolute /assets and relative messages URLs.
-# Keep all browser-visible paths under /mailcatch and rewrite to MailCatcher root internally.
+# MailCatcher is started with --http-path /mailcatch, so it emits /mailcatch/assets URLs.
+# Preserve the browser-visible /mailcatch prefix when proxying to MailCatcher.
 location = /mailcatch {
     return 302 /mailcatch/;
 }
 
 location /mailcatch/ {
-    rewrite ^/mailcatch/(.*)$ /$1 break;
     proxy_pass http://penpot-mailcatch:1080;
     proxy_http_version 1.1;
     proxy_set_header Host $host;

@@ -104,6 +104,7 @@ services:
       start_period: 15s
   penpot-mailcatch:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/mailcatcher:latest
+    command: --ip 0.0.0.0 --http-path /mailcatch
   penpot-postgres:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/postgres:16-alpine
     command: -c max_connections=300

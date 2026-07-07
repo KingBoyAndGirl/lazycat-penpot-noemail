@@ -3,6 +3,7 @@
 ## 2026.07.08
 
 ### Mailcatch 子路径修复
+- MailCatcher 启动参数增加 `--http-path /mailcatch`，让页面输出 `/mailcatch/assets/...`，避免浏览器继续请求 Penpot 根路径 `/assets/...`。
 - 为 `penpot-frontend` 增加启动 wrapper，在容器启动时写入 `mailcatch-locations.conf`，将 `/mailcatch` 与 `/mailcatch/*` 代理并重写到 MailCatcher 根路径；避免 LazyCat 路由不能剥离子路径和 compose_override 文件挂载变目录的问题。
 
 - 改为单实例部署，保留官方 Penpot 登录页。
