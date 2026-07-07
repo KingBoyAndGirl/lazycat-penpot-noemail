@@ -76,6 +76,8 @@ application:
 services:
   penpot-frontend:
     image: registry.cn-shanghai.aliyuncs.com/wtjking/penpot-frontend:2.16.2
+    binds:
+      - /lzcapp/var/data:/opt/data/assets
     environment:
       - PENPOT_FLAGS=disable-email-verification enable-prepl-server enable-mcp disable-secure-session-cookies
     depends_on:
