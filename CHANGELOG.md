@@ -3,6 +3,7 @@
 ## 2026.07.08
 
 ### Mailcatch 子路径修复
+- 新增面向 Penpot 邀请/验证流程的友好收件箱，默认展示收件邮箱、主题、打开/复制邀请链接，并保留 `/mailcatch/raw/` 原始 MailCatcher 调试入口。
 - MailCatcher 启动参数增加 `--http-path /mailcatch`，让页面输出 `/mailcatch/assets/...`，避免浏览器继续请求 Penpot 根路径 `/assets/...`。
 - 为 `penpot-frontend` 增加启动 wrapper，在容器启动时写入 `mailcatch-locations.conf`，将 `/mailcatch` 与 `/mailcatch/*` 代理并重写到 MailCatcher 根路径；避免 LazyCat 路由不能剥离子路径和 compose_override 文件挂载变目录的问题。
 
