@@ -28,6 +28,5 @@
 - 移除 SMTP 环境变量和 enable-smtp flag
 - 添加 penpot-init 容器通过 PREPL 自动创建管理员 (admin / admin123)
 - 添加 enable-mcp flag
-- 镜像来自懒猫 Registry (zeroc/penpotapp + zeroc/zeroc0077)
 
 ---
