@@ -9,18 +9,9 @@ actions:
   prebuild:
     - mkdir -p ./content ./lpk
 
-resource_exports:
-  - kind: skills
-    source: ./resources/skills
-
 compose_override:
   services:
     penpot-backend:
       # Start wrapper as root so it can repair the /lzcapp/var/data bind ownership,
       # then backend-entrypoint.sh drops privileges back to penpot before running Penpot.
       user: "0:0"
-    penpot-frontend:
-      volumes:
-        - type: bind
-          source: /lzcapp/pkg/content/mcp-custom.conf
-          target: /etc/nginx/overrides/server.d/mcp-custom.conf

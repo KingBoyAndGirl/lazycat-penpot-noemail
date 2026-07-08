@@ -2,6 +2,9 @@
 
 ## 2026.07.08
 
+### 打包清理
+- 清理未生效的 `mcp-custom.conf` bind 与写死域名的 `penpot-design` resource skill，MCP 改为依赖 Penpot frontend 镜像内置 `/mcp/stream` 路由。
+
 ### 导出/缩略图修复
 - 通过 `compose_override` 让 backend wrapper 先以 root 启动，修复 `/opt/data/assets` bind 目录为 `1001:1001` 后再降权到 `penpot`；修复 `AccessDeniedException: /opt/data/assets/...` 导致的缩略图/导出失败。
 
