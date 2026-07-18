@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.07.19
+
+### 上游同步
+- 已同步 Penpot 上游版本至 `2.16.2`。
+- `penpot-frontend`、`penpot-backend`、`penpot-exporter` 继续使用对应 ACR 运行时镜像，不使用 Docker Hub 运行时镜像。
+
 ## 2026.07.08
 
 ### 打包清理
